@@ -20,6 +20,9 @@ class Country
 	public $discipline_factor;
 	public $pips_factor;
 	public $generals_factor;
+	public $morale_factor;
+	public $raw_discipline;
+	public $mil_tech;
 
 	public function __construct($data, $save) 
 	{
@@ -47,7 +50,7 @@ class Country
 		$force_limit = 0;
 		$this->player = "";
 		
-		if(isset($this->data['at'])) $at = $this->data['at'];
+		if(isset($this->data['quality']['at'])) $at = (float)$this->data['quality']['at'];
 		if(isset($this->data['leader_land_fire'])) $leader_land_fire = $this->data['leader_land_fire'];
 		if(isset($this->data['leader_land_shock'])) $leader_land_shock = $this->data['leader_land_shock'];
 		if(isset($this->data['quality']['fire_damage_received'])) $fire_damage_received = $this->data['quality']['fire_damage_received'];
@@ -66,6 +69,7 @@ class Country
 		if(isset($this->data['FL'])) $force_limit = (float)$this->data['FL'];
 		if(isset($this->data['player'])) $this->player = $this->data['player'];
 		$mil_tech = $this->data['technology']['mil'];
+		$this->mil_tech = $mil_tech;
 		$this->tag = $this->data['tag'];
 		$this->name = $this->data['countryName'];
 		$tech_group = $this->data['technology_group'];
@@ -73,7 +77,7 @@ class Country
 		$monthly_income = $this->data['monthly_income'];
 		$morale = getBaseMorale($mil_tech) * (1 + $land_morale);
 		
-		
+		$this->raw_discipline = $discipline;
 		$tactics = getTactics($mil_tech, $discipline);
 		
 		$fire_defense = 1 - $fire_damage_received;
@@ -91,6 +95,7 @@ class Country
 		$army_artillery = getArtillery($mil_tech);
 		
 		$generals_factor = ($at*0.08+4)*0.3 - (50*0.08+4)*0.3; //no es exacta, es una aproximación, mejorar
+		
 		$generals_factor_fire = max(0,$generals_factor + $leader_land_fire);
 		$generals_factor_shock = max(0,$generals_factor + $leader_land_shock);
 		
@@ -132,9 +137,9 @@ class Country
 		$total_casualties = $total_casualties_fire_phase*0.52 + $total_casualties_shock_phase*0.48; //se le da esa mayor ponderacion porque la fase de fuego es la primera
 		
 		
-		$morale_factor = $morale / $this->save->base_morale;
+		$this->morale_factor = $morale / $this->save->base_morale;
 		
-		$this->quality = $total_casualties * $morale_factor;
+		$this->quality = $total_casualties * $this->morale_factor;
 		
 		$this->phase_modifier = $fire_modifier*0.52 + $shock_modifier*0.48;
 		$this->combat_ability_factor = ($infantry_combat_ability* $army_infantry + $cavalry_combat_ability*$army_cavalry +  $artillery_combat_ability*$army_artillery) / $this->save->base_width;

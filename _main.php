@@ -62,6 +62,9 @@ foreach($object as $country)
 			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Discipline</th>
 			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Pips</th>
 			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Generals</th>
+			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Morale</th>
+			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Raw Discip.</th>
+			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Mil Tech</th>
 
 		<?php } ?>	
 	</thead>
@@ -87,7 +90,9 @@ foreach($countries as $country) {
 	<td><?= $country->discipline_factor ?></td>
 	<td><?= $country->pips_factor ?></td>
 	<td><?= $country->generals_factor ?></td>
-
+	<td><?= $country->morale_factor ?></td>
+	<td><?= $country->raw_discipline ?></td>
+	<td><?= $country->mil_tech ?></td>
 	<?php } ?>
 	</tr>
 	<?php 
