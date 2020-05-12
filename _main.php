@@ -56,7 +56,13 @@ foreach($object as $country)
 		<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter" data-sort-order="desc" data-title-tooltip="The surplus resulting after fielding max armies possible">Economic Surplus</th>
 		<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter" data-sort-order="desc" data-title-tooltip="Trying to represent the strength of a country taking into account both max. military strength and also economic surplus">Overall Strength</th>
 		<?php if($debug == true) { ?>
-			<th>Data</th>
+			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Phase</th>
+			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">CA</th>
+			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Tech</th>
+			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Discipline</th>
+			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Pips</th>
+			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Generals</th>
+
 		<?php } ?>	
 	</thead>
 	<tbody>
@@ -75,7 +81,13 @@ foreach($countries as $country) {
 	<td><?= $country->free_economic_power ?></td>
 	<td></td>
 	<?php if($debug == true) { ?>
-	<td><?= print_r($country->data); ?></td>
+	<td><?= $country->phase_modifier ?></td>
+	<td><?= $country->combat_ability_factor ?></td>
+	<td><?= $country->tech_factor ?></td>
+	<td><?= $country->discipline_factor ?></td>
+	<td><?= $country->pips_factor ?></td>
+	<td><?= $country->generals_factor ?></td>
+
 	<?php } ?>
 	</tr>
 	<?php 
@@ -83,7 +95,7 @@ foreach($countries as $country) {
 ?>
 </tbody>
 </table>
-<canvas id="myChart" style="max-height:400px; max-width:800px;  margin: auto; width: 50%;"></canvas>
+<canvas id="myChart" style="max-width:800px;  margin: auto; width: 50%;"></canvas>
 <script>
 var ctx = document.getElementById('myChart').getContext('2d');
 var myChart = new Chart(ctx, {
@@ -110,6 +122,9 @@ var myChart = new Chart(ctx, {
 
   function numberFormatter(x) {
     return new Intl.NumberFormat('es-ES', { maximumFractionDigits: 0 }).format(x);
+  }
+    function numberFormatter2D(x) {
+    return new Intl.NumberFormat('es-ES', { maximumFractionDigits: 2 }).format(x);
   }
   $(function() {
 	var $table = $('#table')

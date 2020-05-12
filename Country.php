@@ -14,6 +14,12 @@ class Country
 	public $tag;
 	public $name;
 	public $player;
+	public $phase_modifier;
+	public $combat_ability_factor;
+	public $tech_factor;
+	public $discipline_factor;
+	public $pips_factor;
+	public $generals_factor;
 
 	public function __construct($data, $save) 
 	{
@@ -84,7 +90,7 @@ class Country
 		$army_infantry = $this->save->base_width - $army_cavalry;
 		$army_artillery = getArtillery($mil_tech);
 		
-		$generals_factor = ($at*0.08+4)*0.3 - (0.5*0.08+4)*0.3; //no es exacta, es una aproximación, mejorar
+		$generals_factor = ($at*0.08+4)*0.3 - (50*0.08+4)*0.3; //no es exacta, es una aproximación, mejorar
 		$generals_factor_fire = max(0,$generals_factor + $leader_land_fire);
 		$generals_factor_shock = max(0,$generals_factor + $leader_land_shock);
 		
@@ -129,6 +135,13 @@ class Country
 		$morale_factor = $morale / $this->save->base_morale;
 		
 		$this->quality = $total_casualties * $morale_factor;
+		
+		$this->phase_modifier = $fire_modifier*0.52 + $shock_modifier*0.48;
+		$this->combat_ability_factor = ($infantry_combat_ability* $army_infantry + $cavalry_combat_ability*$army_cavalry +  $artillery_combat_ability*$army_artillery) / $this->save->base_width;
+		$this->tech_factor = (($infantry_fire*0.52+$infantry_shock*0.48)*$army_infantry + ($cavalry_fire*0.52+$cavalry_shock*0.48)*$army_cavalry + ($artillery_fire*0.52+$artillery_shock*0.48)* $army_artillery * 0.5) / $this->save->base_width;
+		$this->discipline_factor = $discipline * $tactics_factor ;
+		$this->pips_factor = (($pips_factor_fire_infantry*0.52+$pips_factor_shock_infantry*0.48)*$army_infantry + ($pips_factor_fire_cavalry*0.52+$pips_factor_shock_cavalry*0.48)*$army_cavalry + ($pips_factor_fire_artillery*0.52+$pips_factor_shock_artillery*0.48)* $army_artillery) / $this->save->base_width;
+		$this->generals_factor = $generals_factor_fire*0.52 + $generals_factor_shock*0.48;
 		
 		$professionalism_ticks_available = $professionalism/5.0;
 		
