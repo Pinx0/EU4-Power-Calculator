@@ -1,4 +1,12 @@
 <?php
+define('INFANTRY', 0);
+define('CAVALRY', 1);
+define('ARTILLERY', 2);
+
+define('FIRE', 0);
+define('SHOCK', 1);
+
+
 function getTactics($mil_tech, $discipline) 
 {
     $base_tactics = 0.5;

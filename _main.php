@@ -26,7 +26,22 @@ $request_url_date = $sk_url . '?' . http_build_query($data_date);
 $body_date = file_get_contents($request_url_date);
 $object_date = json_decode($body_date, true);
 $date = $object_date[0];
-$debug = (bool)$_GET['debug'];
+$debug = 0;
+if(isset($_GET['debug'])) $debug = 1;
+
+$save = new Save($date);
+$countries = array();
+
+foreach($object as $country)
+{
+	$country_data = $country[0];
+	if($country_data['was_player'] != 'Yes') continue;
+	$c = new Country($country_data, $save);
+	$c->Calculate();
+	array_push ( $countries , $c );
+}
+
+
 ?>
 <table id="table">
 	<thead>
@@ -46,41 +61,21 @@ $debug = (bool)$_GET['debug'];
 	</thead>
 	<tbody>
 <?php
-const INFANTRY = 0;
-const CAVALRY = 1;
-const ARTILLERY = 2;
-
-const FIRE = 0;
-const SHOCK = 1;
-	
-
-$current_year = (int)substr($date,0,4); 
-$base_tech = getBaseTech($current_year);
-$base_tactics = getTactics($base_tech, 1);
-$base_width = getCombatWidth($base_tech);
-$base_morale = getBaseMorale($base_tech);
-
-foreach($object as $country)
-{
-	$country_data = $country[0];
-	if($country_data['was_player'] != 'Yes') continue;
-	
-
-	
-	?>
+foreach($countries as $country) {
+?>
 	<tr>
-	<td><?= $country_data['tag'] ?></td>
-	<td><?= $country_data['countryName'] ?></td>
-	<td><?= $country_data['player'] ?></td>
-	<td><?= $quality ?></td>
-	<td><?= $quantity ?></td>
-	<td><?= $military_potential ?></td>
-	<td><?= $economic_power ?></td>
-	<td><?= $military_sustainable ?></td>
-	<td><?= $free_economic_power ?></td>
+	<td><?= $country->data['tag'] ?></td>
+	<td><?= $country->data['countryName'] ?></td>
+	<td><?= $country->data['player'] ?></td>
+	<td><?= $country->quality ?></td>
+	<td><?= $country->quantity ?></td>
+	<td><?= $country->military_potential ?></td>
+	<td><?= $country->economic_power ?></td>
+	<td><?= $country->military_sustainable ?></td>
+	<td><?= $country->free_economic_power ?></td>
 	<td></td>
 	<?php if($debug == true) { ?>
-	<td><?= print_r($country_data); ?></td>
+	<td><?= print_r($country->data); ?></td>
 	<?php } ?>
 	</tr>
 	<?php 

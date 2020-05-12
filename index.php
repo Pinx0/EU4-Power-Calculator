@@ -1,3 +1,7 @@
+<?php 
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+?>
 <!doctype html>
 <html lang="en">
   <head>
@@ -44,16 +48,16 @@
 	</div>
     <?php
 	require_once 'Country.php';
+	require_once 'Save.php';
 	$private_key = 'd7290e10b730afad0f2873e063dbf7f7';
 	$sk_url = 'https://skanderbeg.pm/api.php';
 	if(isset($_GET['id']))
 	{
-		include '_functions.php';
-		include '_main.php';
+		include_once '_main.php';
 	}
 	else 
 	{
-		include '_noid.php';
+		include_once '_noid.php';
 	}
 
 	?>
