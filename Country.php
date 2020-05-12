@@ -11,6 +11,9 @@ class Country
 	public $military_sustainable;
 	public $free_economic_power;
 	public $overall_strength;
+	public $tag;
+	public $name;
+	public $player;
 
 	public function __construct($data, $save) 
 	{
@@ -36,6 +39,7 @@ class Country
 		$artillery_fire_modifier = 0;
 		$max_manpower = 0;
 		$force_limit = 0;
+		$this->player = "";
 		
 		if(isset($this->data['at'])) $at = $this->data['at'];
 		if(isset($this->data['leader_land_fire'])) $leader_land_fire = $this->data['leader_land_fire'];
@@ -53,8 +57,11 @@ class Country
 		if(isset($this->data['manpower_recovery'])) $monthly_manpower_recovery = $this->data['manpower_recovery'];
 		if(isset($this->data['quality']['artillery_fire'])) $artillery_fire_modifier = $this->data['quality']['artillery_fire'];
 		if(isset($this->data['max_manpower'])) $max_manpower = $this->data['max_manpower'];
-		if(isset($this->data['FL'])) $force_limit = $this->data['FL'];
+		if(isset($this->data['FL'])) $force_limit = (float)$this->data['FL'];
+		if(isset($this->data['player'])) $this->player = $this->data['player'];
 		$mil_tech = $this->data['technology']['mil'];
+		$this->tag = $this->data['tag'];
+		$this->name = $this->data['countryName'];
 		$tech_group = $this->data['technology_group'];
 		
 		$monthly_income = $this->data['monthly_income'];
