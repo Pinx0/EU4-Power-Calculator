@@ -35,7 +35,7 @@ $countries = array();
 foreach($object as $country)
 {
 	$country_data = $country[0];
-	if($country_data['was_player'] != 'Yes') continue;
+	if($country_data['was_player'] != 'Yes' || $country_data['monthly_income'] < 1) continue;
 	$c = new Country($country_data, $save);
 	$c->Calculate();
 	array_push ( $countries , $c );
