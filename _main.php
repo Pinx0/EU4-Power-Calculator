@@ -1,5 +1,5 @@
 <?php
-$data = array('key'=> $private_key,
+$data = array('key'=> ConnectionInfo::$skanderbegPrivateKey,
               'scope'=>'getCountryData',
               'format'=>'json',
               'save'=> $_GET['id'],
@@ -7,16 +7,15 @@ $data = array('key'=> $private_key,
 			  'value' => 'was_player;tag;countryName;quality;technology_group;technology;monthly_income;treasury;army_tradition;max_manpower;manpower;army_size;total_army;total_navy;FL;player;discipline;expense;hex'
 			  );
 			  
-$request_url = $sk_url . '?' . http_build_query($data);
+$request_url = ConnectionInfo::$skanderbegApiUrl . '?' . http_build_query($data);
 $body = file_get_contents($request_url);
 $object = json_decode($body, true);
- 
-if (!is_array($object)) 
+ if (!is_array($object)) 
 {
   echo "No data returned from Skanderbeg";
   return;
 }
-$data_date = array('key'=> $private_key,
+$data_date = array('key'=> ConnectionInfo::$skanderbegPrivateKey,
               'scope'=>'getCountryData',
               'format'=>'json',
               'save'=> $_GET['id'],

@@ -1,6 +1,9 @@
 <?php 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+require_once 'Class/Country.php';
+require_once 'Class/Save.php';
+require_once 'Class/ConnectionInfo.php';
 ?>
 <!doctype html>
 <html lang="en">
@@ -18,7 +21,7 @@ ini_set('display_errors', 1);
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 	<script src="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
-	<div id="header" style="">
+	<div id="header">
 		<a href="/">
 			<div id="index">
 				<h1>EU4 Power Calculator</h1>
@@ -31,10 +34,6 @@ ini_set('display_errors', 1);
 		</a>
 	</div>
     <?php
-	require_once 'Country.php';
-	require_once 'Save.php';
-	$private_key = 'd7290e10b730afad0f2873e063dbf7f7';
-	$sk_url = 'https://skanderbeg.pm/api.php';
 	if(isset($_GET['id']))
 	{
 		include_once '_main.php';
@@ -43,8 +42,6 @@ ini_set('display_errors', 1);
 	{
 		include_once '_noid.php';
 	}
-
 	?>
-	
   </body>
 </html>

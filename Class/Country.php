@@ -169,15 +169,6 @@ class Country
 		$this->def_quality = self::getAverageCasualties($this->save->base_country,$this);
 		$this->quality = $this->off_quality/$this->def_quality * $this->morale_factor;
 		
-		/*
-		$this->phase_modifier = $fire_modifier*0.52 + $shock_modifier*0.48;
-		$this->combat_ability_factor = ($infantry_combat_ability* $army_infantry + $cavalry_combat_ability*$army_cavalry +  $artillery_combat_ability*$army_artillery) / $this->save->base_width;
-		$this->tech_factor = (($infantry_fire*0.52+$infantry_shock*0.48)*$army_infantry + ($cavalry_fire*0.52+$cavalry_shock*0.48)*$army_cavalry + ($artillery_fire*0.52+$artillery_shock*0.48)* $army_artillery * 0.5) / $this->save->base_width;
-		$this->discipline_factor = $discipline * $tactics_factor ;
-		$this->pips_factor = (($pips_factor_fire_infantry*0.52+$pips_factor_shock_infantry*0.48)*$army_infantry + ($pips_factor_fire_cavalry*0.52+$pips_factor_shock_cavalry*0.48)*$army_cavalry + ($pips_factor_fire_artillery*0.52+$pips_factor_shock_artillery*0.48)* $army_artillery) / $this->save->base_width;
-		$this->generals_factor = $generals_factor_fire*0.52 + $generals_factor_shock*0.48;
-		*/
-		
 		$professionalism_ticks_available = $this->professionalism/5.0;
 		$yearly_manpower_recovery = $this->monthly_manpower_recovery * 12;
 		$this->quantity = ($this->force_limit*1000.0 + $this->max_manpower * 0.6 +  $professionalism_ticks_available * 2 * $yearly_manpower_recovery * 0.3)/1000.0;
