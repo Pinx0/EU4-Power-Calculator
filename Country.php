@@ -149,8 +149,8 @@ class Country
 		$this->artillery_fire_total_modifier = self::getModifier($this->effective_mil_tech, ARTILLERY, FIRE) + $this->artillery_fire_modifier;
 		$this->artillery_shock_total_modifier = self::getModifier($this->effective_mil_tech, ARTILLERY, SHOCK);
 		
-		$this->general_average_fire = ($this->effective_at*0.08+4)*0.3 + $this->leader_land_fire;
-		$this->general_average_shock = ($this->effective_at*0.08+4)*0.3 + $this->leader_land_shock;
+		$this->general_average_fire = min(self::getAverageGeneralStat($this->effective_at,FIRE) + $this->leader_land_fire,6);
+		$this->general_average_shock = min(self::getAverageGeneralStat($this->effective_at,SHOCK) + $this->leader_land_shock,6);
 		
 	}
 	public function calculate($use_morale, $approximate_tech, $use_at)
@@ -263,7 +263,18 @@ class Country
 
 		return $width ;
 	}
-	
+	private static function getAverageGeneralStat($at,$type)
+	{
+		$score = 3;
+		$score += $at/20.0;
+		$score += $at/100.0;
+		if($at>=20) $score += ($at-20)/100.0;
+		if($at>=40) $score += ($at-40)/100.0;
+		if($at>=60) $score += ($at-60)/100.0;
+		if($at>=80) $score += ($at-80)/100.0;
+		return $score*0.3;
+		
+	}
 	protected static function getArtillery($mil_tech)
 	{
 		if($mil_tech == 7)  return 3;
