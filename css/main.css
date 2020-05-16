@@ -1,0 +1,54 @@
+body 
+{
+	padding:0px 10px;
+}
+#header 
+{
+	margin: 20px 20px 20px 0px;
+}
+#header div
+{
+	display:inline-block;
+}
+#index
+{
+	margin: 0px 100px 0px 0px;
+}
+#skanderbeg
+{
+	background:#444; 
+	padding:10px; 
+	border-radius:5px;
+}
+#header a:link,  #header a:visited , #header a:active 
+{
+	color: white;
+}
+#header a:hover 
+{
+	color: #DDD;
+}
+#header a:link #index, #header a:visited  #index, #header a:active  #index
+{
+	color: black;
+}
+#header a:hover  #index
+{
+	color: #333;
+}
+
+#skanderbeg img
+{
+	width:20px;
+	height:20px;
+}
+#myChart
+{
+	max-width:70%;  
+	margin: auto; 
+	width: 50%;
+}
+#options form span
+{
+	font-weight:bold;
+}
