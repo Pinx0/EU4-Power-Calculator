@@ -3,6 +3,7 @@ $data = array('key'=> $private_key,
               'scope'=>'getCountryData',
               'format'=>'json',
               'save'=> $_GET['id'],
+              'playersOnly'=> true,
 			  'value' => 'was_player;tag;countryName;quality;technology_group;technology;monthly_income;treasury;army_tradition;max_manpower;manpower;army_size;total_army;total_navy;FL;player;discipline;expense;hex'
 			  );
 			  
@@ -47,7 +48,7 @@ $countries = array();
 foreach($object as $country)
 {
 	$country_data = $country[0];
-	if($country_data['was_player'] != 'Yes' || $country_data['monthly_income'] < 1) continue;
+	//if($country_data['was_player'] != 'Yes' || $country_data['monthly_income'] < 1) continue;
 	$c = new Country($country_data, $save);
 	$c->calculate($use_morale, $approximate_tech, $use_at);
 	array_push ( $countries , $c );
@@ -172,7 +173,7 @@ var myChart = new Chart(ctx, {
 		foreach($countries as $country) {  echo "'".$country->hex."'," ; }
 		?> ],
             data: [<?php 
-		foreach($countries as $country) { echo "'".$country->military_potential."'," ; }
+		foreach($countries as $country) { echo "'".round($country->military_potential,0)."'," ; }
 		?>],
             borderWidth: 1
         }]
