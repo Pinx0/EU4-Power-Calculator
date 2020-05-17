@@ -1,4 +1,12 @@
 <?php
+function countrySorter($a, $b)
+{
+    if ($a == $b) {
+        return 0;
+    }
+    return ($a->military_potential < $b->military_potential) ? 1 : -1;
+}
+
 $data = array('key'=> ConnectionInfo::$skanderbegPrivateKey,
               'scope'=>'getCountryData',
               'format'=>'json',
@@ -52,6 +60,8 @@ foreach($object as $country)
 	$c->calculate($use_morale, $approximate_tech, $use_at);
 	array_push ( $countries , $c );
 }
+
+usort($countries, "countrySorter");
 ?>
 <div id="options">
 	<form method="GET" action="/">
