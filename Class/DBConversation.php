@@ -1,5 +1,6 @@
 <?php
 require_once 'Technology.php';
+require_once 'Unit.php';
 class DBConversation 
 {
 	private $db;
@@ -48,10 +49,35 @@ class DBConversation
 		}
 		return $tech;
 	}
-	
-	/*public function getTech2($chat_id, $message) 
+	public function getUnit($tech_id, $tech_group, $unit_type) 
 	{
-		$result = $this->db->query("CALL bot_build_phrase('$message',$chat_id)");
+		$tech_id = (int)$tech_id;
+		$tech_group = addslashes($tech_group);
+		$unit_type = addslashes($unit_type);
+		$result = $this->db->query("SELECT tech_id, tech_group, unit_type, priority, name, fire_off, fire_def, shock_off, shock_def, morale_off, morale_def FROM units where tech_id <= $tech_id AND tech_group = '$tech_group' AND unit_type = '$unit_type' ORDER BY tech_id DESC, priority ASC LIMIT 0,1");
+		$unit = new Unit();
+		if($result && $result->num_rows == 1)
+		{
+			$row = $result->fetch_object();
+			$unit->tech_level = $row->tech_id;
+			$unit->tech_group = $row->tech_group;
+			$unit->unit_type = $row->unit_type;
+			$unit->priority = $row->priority;
+			$unit->name = $row->name;
+			$unit->fire_off = $row->fire_off;
+			$unit->fire_def = $row->fire_def;
+			$unit->shock_off = $row->shock_off;
+			$unit->shock_def = $row->shock_def;
+			$unit->morale_off = $row->morale_off;
+			$unit->morale_def = $row->morale_def;
+			$result->close();
+		}
+		return $unit;
+	}
+	
+	/*public function getMultipleRows($chat_id, $message) 
+	{
+		$result = $this->db->query("");
 		$response = "";
 		if($result)
 		{

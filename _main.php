@@ -90,14 +90,26 @@ foreach($object as $country)
 			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Inf CA</th>
 			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Cav CA</th>
 			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Art CA</th>
-			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Inf Fire Mod</th>
-			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Cav Fire Mod</th>
-			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Art Fire Mod</th>
-			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Inf Shock Mod</th>
-			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Cav Shock Mod</th>
-			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Art Shock Mod</th>
-			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Fire Dice</th>
-			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Shock Dice</th>
+			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Inf F Mod</th>
+			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Cav F Mod</th>
+			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Art F Mod</th>
+			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Inf S Mod</th>
+			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Cav S Mod</th>
+			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Art S Mod</th>
+			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Inf F Of</th>
+			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Cav F Of</th>
+			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Art F Of</th>
+			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Inf S Of</th>
+			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Cav S Of</th>
+			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Art S Of</th>
+			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Inf F Df</th>
+			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Cav F Df</th>
+			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Art F Df</th>
+			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Inf S Df</th>
+			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Cav S Df</th>
+			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Art S Df</th>
+			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Fire Gen</th>
+			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Shock Gen</th>
 			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Eff. Mil Tech</th>
 			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Real Mil Tech</th>
 			<th data-sortable="true" data-search-formatter="false" data-formatter="numberFormatter2D" data-sort-order="desc">Eff. AT</th>
@@ -140,6 +152,18 @@ foreach($countries as $country) {
 	<td><?= $country->infantry_shock_total_modifier ?></td>
 	<td><?= $country->cavalry_shock_total_modifier ?></td>
 	<td><?= $country->artillery_shock_total_modifier ?></td>
+	<td><?= $country->infantry_unit->fire_off ?></td>
+	<td><?= $country->cavalry_unit->fire_off ?></td>
+	<td><?= $country->artillery_unit->fire_off ?></td>
+	<td><?= $country->infantry_unit->shock_off ?></td>
+	<td><?= $country->cavalry_unit->shock_off ?></td>
+	<td><?= $country->artillery_unit->shock_off ?></td>
+	<td><?= $country->infantry_unit->fire_def ?></td>
+	<td><?= $country->cavalry_unit->fire_def ?></td>
+	<td><?= $country->artillery_unit->fire_def ?></td>
+	<td><?= $country->infantry_unit->shock_def ?></td>
+	<td><?= $country->cavalry_unit->shock_def ?></td>
+	<td><?= $country->artillery_unit->shock_def ?></td>
 	<td><?= $country->general_average_fire ?></td>
 	<td><?= $country->general_average_shock ?></td>
 	<td><?= $country->effective_mil_tech->tech_level ?></td>

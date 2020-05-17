@@ -1,8 +1,6 @@
 <?php
-define('INFANTRY', 0);
-define('CAVALRY', 1);
-define('ARTILLERY', 2);
-
+require_once 'Unit.php';
+require_once 'Technology.php';
 define('FIRE', 0);
 define('SHOCK', 1);
 
@@ -64,6 +62,9 @@ class Country
 	public $artillery_shock_total_modifier;
 	public $general_average_fire;
 	public $general_average_shock;
+	public $infantry_unit;
+	public $cavalry_unit;
+	public $artillery_unit;
 
 	public function __construct($data, $save, $db) 
 	{
@@ -151,6 +152,9 @@ class Country
 		{
 			$this->effective_at = 50;
 		}
+		$this->infantry_unit = $this->db->getUnit($this->effective_mil_tech->tech_level, $this->tech_group, 'infantry');
+		$this->cavalry_unit = $this->db->getUnit($this->effective_mil_tech->tech_level, $this->tech_group, 'cavalry');
+		$this->artillery_unit = $this->db->getUnit($this->effective_mil_tech->tech_level, 'all', 'artillery');
 		
 		$this->effective_morale = $this->effective_mil_tech->morale * (1 + $this->land_morale_modifier);
 		$this->effective_tactics = $this->effective_mil_tech->tactics * $this->discipline;
@@ -204,12 +208,15 @@ class Country
 		
 		$average_dice_roll = 4.5;
 		
-		$pips_factor_fire_infantry = self::getUnitPips($attacker->effective_mil_tech->tech_level, $attacker->tech_group, INFANTRY, FIRE) - self::getUnitPips($defender->effective_mil_tech->tech_level, $defender->tech_group, INFANTRY, FIRE);
-		$pips_factor_shock_infantry = self::getUnitPips($attacker->effective_mil_tech->tech_level, $attacker->tech_group, INFANTRY, FIRE) - self::getUnitPips($defender->effective_mil_tech->tech_level, $defender->tech_group, INFANTRY, SHOCK);
-		$pips_factor_fire_cavalry = self::getUnitPips($attacker->effective_mil_tech->tech_level, $attacker->tech_group, CAVALRY, FIRE) - self::getUnitPips($defender->effective_mil_tech->tech_level, $defender->tech_group, CAVALRY, FIRE);
-		$pips_factor_shock_cavalry = self::getUnitPips($attacker->effective_mil_tech->tech_level, $attacker->tech_group, CAVALRY, FIRE) - self::getUnitPips($defender->effective_mil_tech->tech_level, $defender->tech_group, CAVALRY, SHOCK);
-		$pips_factor_fire_artillery = self::getUnitPips($attacker->effective_mil_tech->tech_level, $attacker->tech_group, ARTILLERY, FIRE) - self::getUnitPips($defender->effective_mil_tech->tech_level, $defender->tech_group, INFANTRY, FIRE);
-		$pips_factor_shock_artillery = self::getUnitPips($attacker->effective_mil_tech->tech_level, $attacker->tech_group, ARTILLERY, SHOCK) - self::getUnitPips($defender->effective_mil_tech->tech_level, $defender->tech_group, INFANTRY, SHOCK);
+		$defender_fire_protection_from_artillery = floor($defender->artillery_unit->fire_def/2.0);
+		$defender_shock_protection_from_artillery = floor($defender->artillery_unit->shock_def/2.0);
+		
+		$pips_factor_fire_infantry = $attacker->infantry_unit->fire_off - ($defender->infantry_unit->fire_def + $defender_fire_protection_from_artillery);
+		$pips_factor_shock_infantry = $attacker->infantry_unit->shock_off - ($defender->infantry_unit->shock_def + $defender_shock_protection_from_artillery);
+		$pips_factor_fire_cavalry = $attacker->cavalry_unit->fire_off - ($defender->cavalry_unit->fire_def + $defender_fire_protection_from_artillery);
+		$pips_factor_shock_cavalry = $attacker->cavalry_unit->shock_off - ($defender->cavalry_unit->shock_def + $defender_shock_protection_from_artillery);
+		$pips_factor_fire_artillery = $attacker->artillery_unit->fire_off - ($defender->infantry_unit->fire_def + $defender_fire_protection_from_artillery);
+		$pips_factor_shock_artillery = $attacker->artillery_unit->shock_off - ($defender->infantry_unit->shock_def + $defender_shock_protection_from_artillery);
 		
 		$base_casualites_fire_phase_infantry = max(15 + 5*($average_dice_roll + $fire_dice_advantage + $pips_factor_fire_infantry),0);
 		$base_casualites_shock_phase_infantry = max(15 + 5*($average_dice_roll + $shock_dice_advantage + $pips_factor_shock_infantry),0);
@@ -264,10 +271,6 @@ class Country
 		if($cavalry_combat_ability>=1.3) return 10;
 		if($cavalry_combat_ability>=1.2) return 6;
 		return 4;
-	}
-	protected static function getUnitPips($mil_tech, $tech_group, $unit_type, $phase) 
-	{
-		return 0;
 	}
 }
 ?>
