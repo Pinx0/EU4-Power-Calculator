@@ -53,6 +53,11 @@ class DBConversation
 	{
 		$tech_id = (int)$tech_id;
 		$tech_group = addslashes($tech_group);
+		if($tech_group=="ottoman") $tech_group = "anatolian";
+		if($tech_group=="nomad_group") $tech_group = "nomad";
+		if($tech_group=="sub_saharan") $tech_group = "african";
+		if($tech_group=="andean") $tech_group = "south_american";
+		if (strpos($tech_group, 'african') !== false) $tech_group = "african";
 		$unit_type = addslashes($unit_type);
 		$result = $this->db->query("SELECT tech_id, tech_group, unit_type, priority, name, fire_off, fire_def, shock_off, shock_def, morale_off, morale_def FROM units where tech_id <= $tech_id AND tech_group = '$tech_group' AND unit_type = '$unit_type' ORDER BY tech_id DESC, priority ASC LIMIT 0,1");
 		$unit = new Unit();

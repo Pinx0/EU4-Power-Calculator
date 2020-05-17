@@ -15,8 +15,9 @@ class Save
 		$this->current_year = (int)substr($date,0,4); 
 		$this->base_tech_level = $db->getBaseTech($this->current_year + 3);
 		$this->base_tech = $db->getTech($this->base_tech_level);
+		$this->createBaseCountry();
 	}
-	public function createBaseCountry() 
+	private function createBaseCountry() 
 	{
 		$this->base_country = new BaseCountry($this, $this->db);
 	}

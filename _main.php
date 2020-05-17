@@ -12,7 +12,7 @@ $data = array('key'=> ConnectionInfo::$skanderbegPrivateKey,
               'format'=>'json',
               'save'=> $_GET['id'],
               'playersOnly'=> true,
-			  'value' => 'was_player;tag;countryName;quality;technology_group;technology;monthly_income;treasury;army_tradition;max_manpower;manpower;army_size;total_army;total_navy;FL;player;discipline;expense;hex'
+			  'value' => 'was_player;tag;countryName;quality;technology_group;technology;monthly_income;treasury;max_manpower;manpower;army_size;total_army;total_navy;FL;player;discipline;expense;hex'
 			  );
 			  
 $request_url = ConnectionInfo::$skanderbegApiUrl . '?' . http_build_query($data);
@@ -49,16 +49,15 @@ if(isset($_GET['config']))
 }
 $db = new DBConversation(ConnectionInfo::$dbHost, ConnectionInfo::$dbUser, ConnectionInfo::$dbPassword, ConnectionInfo::$dbName);
 $save = new Save($date,$db);
-$save->createBaseCountry();
-$countries = array();
 
+$countries = array();
 foreach($object as $country)
 {
 	$country_data = $country[0];
 	//if($country_data['was_player'] != 'Yes' || $country_data['monthly_income'] < 1) continue;
 	$c = new Country($country_data, $save, $db);
 	$c->calculate($use_morale, $approximate_tech, $use_at);
-	array_push ( $countries , $c );
+	array_push ($countries , $c);
 }
 
 usort($countries, "countrySorter");
