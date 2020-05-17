@@ -8,8 +8,9 @@ define('SHOCK', 1);
 
 class Country 
 {
-	public $data;
-	public $save;
+	private $data;
+	protected $db;
+	protected $save;
 	public $off_quality;
 	public $def_quality;
 	public $quality;
@@ -64,10 +65,11 @@ class Country
 	public $general_average_fire;
 	public $general_average_shock;
 
-	public function __construct($data, $save) 
+	public function __construct($data, $save, $db) 
 	{
 		$this->data = $data;
 		$this->save = $save;
+		$this->db = $db;
 		$this->initializeValues();
 	}
 	private function initializeValues() 
@@ -115,11 +117,21 @@ class Country
 		$this->tag = $this->data['tag'];
 		$this->name = $this->data['countryName'];
 		$this->tech_group = $this->data['technology_group'];
-		$this->real_mil_tech = (int)$this->data['technology']['mil'];
-		$this->approx_mil_tech = $this->real_mil_tech;
-		if($this->real_mil_tech + 1 <= $this->save->base_tech) { $this->approx_mil_tech = $this->real_mil_tech + 1; }
+		$real_mil_tech_level = (int)$this->data['technology']['mil'];
+		$this->real_mil_tech = $this->db->getTech($real_mil_tech_level);
+		
+		$approx_mil_tech_level = $real_mil_tech_level;
+		if($real_mil_tech_level + 1 <= $this->save->base_tech->tech_level) { $approx_mil_tech_level = $real_mil_tech_level + 1; }
+		if($real_mil_tech_level == $approx_mil_tech_level)
+		{
+			$this->approx_mil_tech = $this->real_mil_tech;
+		}
+		else 
+		{
+			$this->approx_mil_tech = $this->db->getTech($approx_mil_tech_level);
+		}
 		$this->monthly_income = $this->data['monthly_income'];
-		$this->real_tactics = self::getTactics($this->real_mil_tech, $this->discipline);
+		$this->real_tactics = $this->real_mil_tech->tactics * $this->discipline;
 	}
 	protected function setEffectiveValues($approximate_tech, $use_at)
 	{
@@ -139,15 +151,16 @@ class Country
 		{
 			$this->effective_at = 50;
 		}
-		$this->effective_morale = self::getBaseMorale($this->effective_mil_tech) * (1 + $this->land_morale_modifier);
-		$this->effective_tactics = self::getTactics($this->effective_mil_tech, $this->discipline);
 		
-		$this->infantry_fire_total_modifier = self::getModifier($this->effective_mil_tech, INFANTRY, FIRE);
-		$this->infantry_shock_total_modifier = self::getModifier($this->effective_mil_tech, INFANTRY, SHOCK);
-		$this->cavalry_fire_total_modifier = self::getModifier($this->effective_mil_tech, CAVALRY, FIRE);
-		$this->cavalry_shock_total_modifier = self::getModifier($this->effective_mil_tech, CAVALRY, SHOCK);
-		$this->artillery_fire_total_modifier = self::getModifier($this->effective_mil_tech, ARTILLERY, FIRE) + $this->artillery_fire_modifier;
-		$this->artillery_shock_total_modifier = self::getModifier($this->effective_mil_tech, ARTILLERY, SHOCK);
+		$this->effective_morale = $this->effective_mil_tech->morale * (1 + $this->land_morale_modifier);
+		$this->effective_tactics = $this->effective_mil_tech->tactics * $this->discipline;
+
+		$this->infantry_fire_total_modifier = $this->effective_mil_tech->infantry_fire;
+		$this->infantry_shock_total_modifier = $this->effective_mil_tech->infantry_shock;
+		$this->cavalry_fire_total_modifier = $this->effective_mil_tech->cavalry_fire;
+		$this->cavalry_shock_total_modifier = $this->effective_mil_tech->cavalry_shock;
+		$this->artillery_fire_total_modifier = $this->effective_mil_tech->artillery_fire;
+		$this->artillery_shock_total_modifier = $this->effective_mil_tech->artillery_shock;
 		
 		$this->general_average_fire = min(self::getAverageGeneralStat($this->effective_at,FIRE) + $this->leader_land_fire,6);
 		$this->general_average_shock = min(self::getAverageGeneralStat($this->effective_at,SHOCK) + $this->leader_land_shock,6);
@@ -183,20 +196,20 @@ class Country
 	private static function getAverageCasualties($attacker, $defender)
 	{
 		$army_cavalry = self::getCavalry($attacker->cavalry_combat_ability);
-		$army_infantry = $attacker->save->base_width - $army_cavalry;
-		$army_artillery = self::getArtillery($attacker->effective_mil_tech);
+		$army_infantry = $attacker->save->base_tech->combat_width - $army_cavalry;
+		$army_artillery = self::getArtillery($attacker->effective_mil_tech->tech_level, $attacker->save->base_tech->combat_width);
 		
 		$fire_dice_advantage = max(0,$attacker->general_average_fire - $defender->general_average_fire);
 		$shock_dice_advantage = max(0,$attacker->general_average_shock - $defender->general_average_shock);
 		
 		$average_dice_roll = 4.5;
 		
-		$pips_factor_fire_infantry = self::getUnitPips($attacker->effective_mil_tech, $attacker->tech_group, INFANTRY, FIRE) - self::getUnitPips($defender->effective_mil_tech, $defender->tech_group, INFANTRY, FIRE);
-		$pips_factor_shock_infantry = self::getUnitPips($attacker->effective_mil_tech, $attacker->tech_group, INFANTRY, FIRE) - self::getUnitPips($defender->effective_mil_tech, $defender->tech_group, INFANTRY, SHOCK);
-		$pips_factor_fire_cavalry = self::getUnitPips($attacker->effective_mil_tech, $attacker->tech_group, CAVALRY, FIRE) - self::getUnitPips($defender->effective_mil_tech, $defender->tech_group, CAVALRY, FIRE);
-		$pips_factor_shock_cavalry = self::getUnitPips($attacker->effective_mil_tech, $attacker->tech_group, CAVALRY, FIRE) - self::getUnitPips($defender->effective_mil_tech, $defender->tech_group, CAVALRY, SHOCK);
-		$pips_factor_fire_artillery = self::getUnitPips($attacker->effective_mil_tech, $attacker->tech_group, ARTILLERY, FIRE) - self::getUnitPips($defender->effective_mil_tech, $defender->tech_group, INFANTRY, FIRE);
-		$pips_factor_shock_artillery = self::getUnitPips($attacker->effective_mil_tech, $attacker->tech_group, ARTILLERY, SHOCK) - self::getUnitPips($defender->effective_mil_tech, $defender->tech_group, INFANTRY, SHOCK);
+		$pips_factor_fire_infantry = self::getUnitPips($attacker->effective_mil_tech->tech_level, $attacker->tech_group, INFANTRY, FIRE) - self::getUnitPips($defender->effective_mil_tech->tech_level, $defender->tech_group, INFANTRY, FIRE);
+		$pips_factor_shock_infantry = self::getUnitPips($attacker->effective_mil_tech->tech_level, $attacker->tech_group, INFANTRY, FIRE) - self::getUnitPips($defender->effective_mil_tech->tech_level, $defender->tech_group, INFANTRY, SHOCK);
+		$pips_factor_fire_cavalry = self::getUnitPips($attacker->effective_mil_tech->tech_level, $attacker->tech_group, CAVALRY, FIRE) - self::getUnitPips($defender->effective_mil_tech->tech_level, $defender->tech_group, CAVALRY, FIRE);
+		$pips_factor_shock_cavalry = self::getUnitPips($attacker->effective_mil_tech->tech_level, $attacker->tech_group, CAVALRY, FIRE) - self::getUnitPips($defender->effective_mil_tech->tech_level, $defender->tech_group, CAVALRY, SHOCK);
+		$pips_factor_fire_artillery = self::getUnitPips($attacker->effective_mil_tech->tech_level, $attacker->tech_group, ARTILLERY, FIRE) - self::getUnitPips($defender->effective_mil_tech->tech_level, $defender->tech_group, INFANTRY, FIRE);
+		$pips_factor_shock_artillery = self::getUnitPips($attacker->effective_mil_tech->tech_level, $attacker->tech_group, ARTILLERY, SHOCK) - self::getUnitPips($defender->effective_mil_tech->tech_level, $defender->tech_group, INFANTRY, SHOCK);
 		
 		$base_casualites_fire_phase_infantry = max(15 + 5*($average_dice_roll + $fire_dice_advantage + $pips_factor_fire_infantry),0);
 		$base_casualites_shock_phase_infantry = max(15 + 5*($average_dice_roll + $shock_dice_advantage + $pips_factor_shock_infantry),0);
@@ -219,41 +232,6 @@ class Country
 		
 		return $total_casualties;
 	}
-	protected static function getTactics($mil_tech, $discipline) 
-	{
-		$base_tactics = 0.5;
-		if($mil_tech >= 4)	$base_tactics += 0.25;
-		if($mil_tech >= 6)	$base_tactics += 0.25;
-		if($mil_tech >= 7)	$base_tactics += 0.25;
-		if($mil_tech >= 9)	$base_tactics += 0.25;
-		if($mil_tech >= 12)	$base_tactics += 0.25;
-		if($mil_tech >= 15)	$base_tactics += 0.25;
-		if($mil_tech >= 19)	$base_tactics += 0.25;
-		if($mil_tech >= 21)	$base_tactics += 0.25;
-		if($mil_tech >= 23)	$base_tactics += 0.25;
-		if($mil_tech >= 24)	$base_tactics += 0.25;
-		if($mil_tech >= 30)	$base_tactics += 0.25;
-		if($mil_tech >= 32)	$base_tactics += 0.25;
-		return $base_tactics * $discipline;
-	}
-	public static function getCombatWidth($mil_tech) 
-	{
-		$width = 15;
-		if($mil_tech >= 2)	$width += 5;
-		if($mil_tech >= 5)	$width += 2;
-		if($mil_tech >= 6)	$width += 2;
-		if($mil_tech >= 9)	$width += 1;
-		if($mil_tech >= 11)	$width += 2;
-		if($mil_tech >= 14)	$width += 2;
-		if($mil_tech >= 16)	$width += 1;
-		if($mil_tech >= 18)	$width += 2;
-		if($mil_tech >= 20)	$width += 2;
-		if($mil_tech >= 22)	$width += 2;
-		if($mil_tech >= 24)	$width += 2;
-		if($mil_tech >= 26)	$width += 2;
-
-		return $width ;
-	}
 	private static function getAverageGeneralStat($at,$type)
 	{
 		$score = 3;
@@ -266,7 +244,7 @@ class Country
 		return $score*0.3;
 		
 	}
-	protected static function getArtillery($mil_tech)
+	protected static function getArtillery($mil_tech, $combat_width)
 	{
 		if($mil_tech == 7)  return 3;
 		if($mil_tech == 8)  return 5;
@@ -277,7 +255,7 @@ class Country
 		if($mil_tech == 13)  return 17;
 		if($mil_tech == 14)  return 20;
 		if($mil_tech == 15)  return 25;
-		if($mil_tech >= 16) return self::getCombatWidth($mil_tech);
+		if($mil_tech >= 16) return $combat_width;
 		return 0;
 	}
 	protected static function getCavalry($cavalry_combat_ability)
@@ -287,113 +265,9 @@ class Country
 		if($cavalry_combat_ability>=1.2) return 6;
 		return 4;
 	}
-	protected static function getModifier($mil_tech, $unit_type, $phase) 
-	{
-		switch($phase)
-		{
-			case FIRE:
-				switch($unit_type)
-				{
-					case INFANTRY:
-						return self::getInfantryFire($mil_tech);
-					case CAVALRY:
-						return self::getCavalryFire($mil_tech);
-					case ARTILLERY:
-						return self::getArtilleryFire($mil_tech);
-				}
-				break;
-			case SHOCK:
-				switch($unit_type)
-				{
-					case INFANTRY:
-						return self::getInfantryShock($mil_tech);
-					case CAVALRY:
-						return self::getCavalryShock($mil_tech);
-					case ARTILLERY:
-						return self::getArtilleryShock($mil_tech);
-				}
-				break;
-		}
-		return 0;
-	}
 	protected static function getUnitPips($mil_tech, $tech_group, $unit_type, $phase) 
 	{
 		return 0;
-	}
-	protected static function getInfantryFire($mil_tech) 
-	{
-		$base = 0.25;
-		if($mil_tech >= 1) $base += 0.1;
-		if($mil_tech >= 6) $base += 0.2;
-		if($mil_tech >= 8) $base += 0.25;
-		if($mil_tech >= 14) $base += 0.3;
-		if($mil_tech >= 20) $base += 0.5;
-		if($mil_tech >= 27) $base += 0.5;
-		if($mil_tech >= 31) $base += 1;
-		return $base;
-	}
-	protected static function getCavalryFire($mil_tech) 
-	{
-		$base = 0;
-		if($mil_tech >= 11) $base += 0.5;
-		if($mil_tech >= 22) $base += 0.5;
-		return $base;
-	}
-	protected static function getArtilleryFire($mil_tech) 
-	{
-		$base = 0;
-		if($mil_tech >= 7) $base += 1;
-		if($mil_tech >= 13) $base += 0.4;
-		if($mil_tech >= 16) $base += 1;
-		if($mil_tech >= 22) $base += 2;
-		if($mil_tech >= 25) $base += 2;
-		if($mil_tech >= 32) $base += 2;
-		return $base;
-	}
-	protected static function getInfantryShock($mil_tech) 
-	{
-		$base = 0.2;
-		if($mil_tech >= 1) $base += 0.1;
-		if($mil_tech >= 2) $base += 0.2;
-		if($mil_tech >= 5) $base += 0.15;
-		if($mil_tech >= 6) $base += 0.3;
-		if($mil_tech >= 11) $base += 0.2;
-		if($mil_tech >= 21) $base += 0.5;
-		if($mil_tech >= 28) $base += 0.5;
-		return $base;
-	}
-	protected static function getCavalryShock($mil_tech) 
-	{
-		$base = 0.8;
-		if($mil_tech >= 2) $base += 0.2;
-		if($mil_tech >= 5) $base += 0.2;
-		if($mil_tech >= 8) $base += 0.8;
-		if($mil_tech >= 17) $base += 1;
-		if($mil_tech >= 23) $base += 1;
-		if($mil_tech >= 31) $base += 1;
-		return $base;
-	}
-	protected static function getArtilleryShock($mil_tech) 
-	{
-		$base = 0;
-		if($mil_tech >= 7) $base += 0.05;
-		if($mil_tech >= 13) $base += 0.1;
-		if($mil_tech >= 16) $base += 0.1;
-		if($mil_tech >= 22) $base += 0.1;
-		if($mil_tech >= 25) $base += 0.1;
-		if($mil_tech >= 32) $base += 0.1;
-
-		return $base;
-	}
-	protected static function getBaseMorale($mil_tech) 
-	{
-		$base = 2;
-		if($mil_tech >= 3) $base += 0.5;
-		if($mil_tech >= 4) $base += 0.5;
-		if($mil_tech >= 15) $base += 1;
-		if($mil_tech >= 26) $base += 1;
-		if($mil_tech >= 30) $base += 1;
-		return $base;
 	}
 }
 ?>

@@ -4,6 +4,7 @@ ini_set('display_errors', 1);
 require_once 'Class/Country.php';
 require_once 'Class/Save.php';
 require_once 'Class/ConnectionInfo.php';
+require_once 'Class/DBConversation.php';
 ?>
 <!doctype html>
 <html lang="en">
@@ -29,7 +30,7 @@ require_once 'Class/ConnectionInfo.php';
 		</a>
 		<a href="https://skanderbeg.pm/<?php if(isset($_GET['id'])) { echo "browse.php?id=".$_GET['id']; } ?>">
 			<div id="skanderbeg">
-				Powered by <img src="./sk_logo.png"/> Skanderbeg
+				Powered by <img src="./images/sk_logo.png"/> Skanderbeg
 			</div>
 		</a>
 	</div>

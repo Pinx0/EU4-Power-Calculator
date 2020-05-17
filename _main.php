@@ -22,7 +22,7 @@ $data_date = array('key'=> ConnectionInfo::$skanderbegPrivateKey,
 			  'value' => 'date'
 			  );
 			  
-$request_url_date = $sk_url . '?' . http_build_query($data_date);
+$request_url_date = ConnectionInfo::$skanderbegApiUrl . '?' . http_build_query($data_date);
 $body_date = file_get_contents($request_url_date);
 $object_date = json_decode($body_date, true);
 $date = $object_date[0];
@@ -39,8 +39,8 @@ if(isset($_GET['config']))
 	$approximate_tech = 1;
 	$use_at = 1;
 }
-
-$save = new Save($date);
+$db = new DBConversation(ConnectionInfo::$dbHost, ConnectionInfo::$dbUser, ConnectionInfo::$dbPassword, ConnectionInfo::$dbName);
+$save = new Save($date,$db);
 $save->createBaseCountry();
 $countries = array();
 
@@ -48,7 +48,7 @@ foreach($object as $country)
 {
 	$country_data = $country[0];
 	//if($country_data['was_player'] != 'Yes' || $country_data['monthly_income'] < 1) continue;
-	$c = new Country($country_data, $save);
+	$c = new Country($country_data, $save, $db);
 	$c->calculate($use_morale, $approximate_tech, $use_at);
 	array_push ( $countries , $c );
 }
@@ -114,7 +114,7 @@ foreach($countries as $country) {
 	<tr>
 	<td><?= $country->tag ?></td>
 	<td><?= $country->name ?></td>
-	<td><?= $country->player ?><?php if($country->player=="necotheone") { ?><img width="35" height="35" src="./Galley.png"/><?php } ?></td>
+	<td><?= $country->player ?><?php if($country->player=="necotheone") { ?><img width="35" height="35" src="./images/Galley.png"/><?php } ?></td>
 	<td><?= $country->off_quality ?></td>
 	<td><?= $country->def_quality ?></td>
 	<td><?= $country->quality ?></td>
@@ -142,8 +142,8 @@ foreach($countries as $country) {
 	<td><?= $country->artillery_shock_total_modifier ?></td>
 	<td><?= $country->general_average_fire ?></td>
 	<td><?= $country->general_average_shock ?></td>
-	<td><?= $country->effective_mil_tech ?></td>
-	<td><?= $country->real_mil_tech ?></td>
+	<td><?= $country->effective_mil_tech->tech_level ?></td>
+	<td><?= $country->real_mil_tech->tech_level ?></td>
 	<td><?= $country->effective_at ?></td>
 	<td><?= $country->at ?></td>
 	<td><?= $country->morale_factor ?></td>

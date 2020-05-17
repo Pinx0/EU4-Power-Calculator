@@ -2,9 +2,10 @@
 require_once 'Country.php';
 class BaseCountry extends Country
 {
-	public function __construct($save) 
+	public function __construct($save, $db) 
 	{
 		$this->save = $save;
+		$this->db = $db;
 		$this->initializeValues();
 	}
 	private function initializeValues() 
@@ -30,8 +31,8 @@ class BaseCountry extends Country
 		$this->hex = "#000000";
 		$this->tech_group = 'Western';
 		$this->real_mil_tech = $this->save->base_tech;
-		$this->real_tactics = self::getTactics($this->real_mil_tech, $this->discipline);
 		$this->approx_mil_tech = $this->real_mil_tech;
+		$this->real_tactics = $this->real_mil_tech->tactics;
 		
 		$this->setEffectiveValues(false, false);
 	}
